@@ -1951,8 +1951,8 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
 
       function removeModalWindow(modalInstance) {
 
-        var body = $document.find('body').eq(0);
         var modalWindow = openedWindows.get(modalInstance).value;
+        var body = modalWindow.appendTo;
 
         //clean up the stack
         openedWindows.remove(modalInstance);
@@ -2030,10 +2030,11 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
           deferred: modal.deferred,
           modalScope: modal.scope,
           backdrop: modal.backdrop,
-          keyboard: modal.keyboard
+          keyboard: modal.keyboard,
+          appendTo: modal.appendTo
         });
 
-        var body = $document.find('body').eq(0),
+        var body = modal.appendTo,
             currBackdropIndex = backdropIndex();
 
         if (currBackdropIndex >= 0 && !backdropDomEl) {
@@ -2142,6 +2143,8 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
             modalOptions = angular.extend({}, $modalProvider.options, modalOptions);
             modalOptions.resolve = modalOptions.resolve || {};
 
+            modalOptions.appendTo = modalOptions.appendTo || $document.find('body').eq(0);
+
             //verify options
             if (!modalOptions.template && !modalOptions.templateUrl) {
               throw new Error('One of template or templateUrl options is required.');
@@ -2183,7 +2186,8 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
                 backdropClass: modalOptions.backdropClass,
                 windowClass: modalOptions.windowClass,
                 windowTemplateUrl: modalOptions.windowTemplateUrl,
-                size: modalOptions.size
+                size: modalOptions.size,
+                appendTo: modalOptions.appendTo
               });
 
             }, function resolveError(reason) {
@@ -3675,7 +3679,7 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
       //we need to propagate user's query so we can higlight matches
       scope.query = undefined;
 
-      //Declare the timeout promise var outside the function scope so that stacked calls can be cancelled later 
+      //Declare the timeout promise var outside the function scope so that stacked calls can be cancelled later
       var timeoutPromise;
 
       var scheduleSearchWithTimeout = function(inputValue) {
